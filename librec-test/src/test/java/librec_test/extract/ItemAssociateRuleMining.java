@@ -1,0 +1,105 @@
+package librec_test.extract;
+
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintStream;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
+public class ItemAssociateRuleMining {
+	/**
+	 * 获取所有item对应的set 如对1号物品，<br/>
+	 * 1表示用户喜欢该物品1，则关联的项目集合为A=｛。。。｝<br/>
+	 * -1表是用户不喜欢物品1,则关联的项目集合为B=｛。。。｝
+	 * 
+	 * @param filePath
+	 *            mahout使用关联规则算法挖掘出来的频繁项
+	 * @return
+	 */
+	public Map<Integer, HashMap<Integer, Integer>> getItemSet(String filePath) {
+		BufferedReader br = null;
+		Map<Integer, HashMap<Integer, Integer>> ans = new HashMap<>();
+		try {
+			br = new BufferedReader(new InputStreamReader(new FileInputStream(filePath), "UTF-8"));
+			String line = null;
+			String[] split;
+			Integer[] keys;
+			Integer key;
+			HashMap<Integer, Integer> tempMap;
+			while ((line = br.readLine()) != null) {
+				int indexOf = line.indexOf('|');
+				Integer times = Integer.parseInt(line.substring(indexOf + 1));
+				split = line.substring(0, indexOf).split(",");
+				keys = new Integer[split.length];
+				for (int i = 0; i < split.length; i++) {
+					keys[i] = Integer.parseInt(split[i].trim());
+				}
+				for (int i = 0; i < keys.length; i++) {
+					key = keys[i];
+					tempMap = ans.get(key);
+					if (tempMap == null) {
+						tempMap = new HashMap<>();
+						ans.put(key, tempMap);
+					}
+					for (int j = 0; j < keys.length; j++) {
+						if (tempMap.get(keys[j]) == null) {
+							tempMap.put(keys[j], times);
+						} else {
+							if (tempMap.get(keys[j]) < times)
+								tempMap.put(keys[j], times);
+						}
+					}
+				}
+			}
+		} catch (Exception e) {
+			// TODO: handle exception
+		} finally {
+			// TODO: handle finally clause
+			try {
+				br.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				System.out.println("流关闭失败");
+				e.printStackTrace();
+			}
+		}
+		return ans;
+	}
+
+	private static void arrayOut(String filePath) throws Exception {
+		BufferedReader br = null;
+		System.setOut(new PrintStream(new FileOutputStream("C:\\Users\\ljd\\Desktop\\论文相关--开题报告--梁继东\\testout\\out_new1\\userArrayFianlly.txt")));
+		// br = new BufferedReader(new InputStreamReader(new
+		// FileInputStream("C:\\Users\\ljd\\Desktop\\论文相关--开题报告--梁继东\\testout\\out_new\\out2frequentpatterns.txt"),
+		// "UTF-8"));
+		br = new BufferedReader(new InputStreamReader(new FileInputStream(filePath), "UTF-8"));
+		String line = null;
+		while ((line = br.readLine()) != null) {
+			int start = line.indexOf('[');
+			int end = line.indexOf(']');
+			System.out.print(line.substring(start + 1, end));
+			System.out.print("|");
+			start = line.lastIndexOf(',');
+			end = line.indexOf(')');
+			System.out.println(line.substring(start + 1, end));
+		}
+		br.close();
+
+	}
+
+	public static void main(String[] args) throws Exception {
+		arrayOut("C:\\Users\\ljd\\Desktop\\论文相关--开题报告--梁继东\\testout\\out_new1\\userArray.txt");
+		Map<Integer, HashMap<Integer, Integer>> itemSet = new ItemAssociateRuleMining().getItemSet("C:\\Users\\ljd\\Desktop\\论文相关--开题报告--梁继东\\testout\\out_new\\userArrayFianlly.txt");
+		// System.setOut(new PrintStream(
+		// new
+		// FileOutputStream("C:\\Users\\ljd\\Desktop\\论文相关--开题报告--梁继东\\testout\\itemSet.txt")));
+		System.out.println(itemSet.get(1));
+		System.out.println(itemSet.get(-1));
+	}
+}
