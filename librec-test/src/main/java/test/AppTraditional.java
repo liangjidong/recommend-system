@@ -1,25 +1,14 @@
-package librec_test;
+package test;
 
 import common.PropertiesUtils;
 import net.librec.conf.Configuration;
 import net.librec.data.model.TextDataModel;
-import net.librec.eval.RecommenderEvaluator;
-import net.librec.eval.ranking.PrecisionEvaluator;
-import net.librec.eval.ranking.RecallEvaluator;
-import net.librec.eval.rating.MAEEvaluator;
 import net.librec.math.algorithm.Randoms;
-import net.librec.recommender.Recommender;
 import net.librec.recommender.RecommenderContext;
-import net.librec.recommender.cf.UserKNNRecommender;
-import net.librec.similarity.AbstractRecommenderSimilarity;
-import net.librec.similarity.PCCSimilarity;
-import similarity.HybirdSimilarity2;
+import net.librec.similarity.CosineSimilarity;
+import net.librec.similarity.RecommenderSimilarity;
 
-/**
- * Hello world!
- *
- */
-public class App {
+public class AppTraditional {
 	public static void main(String[] args) throws Exception {
 		String dirName = "Data_EXTRACT";
 		Configuration conf = new Configuration();
@@ -47,14 +36,12 @@ public class App {
 		RecommenderContext context = new RecommenderContext(conf, dataModel);
 
 		conf.set("rec.recommender.similarity.key", "user");
-		AbstractRecommenderSimilarity similarity = new PCCSimilarity();
-		// AbstractRecommenderSimilarity similarity = new CosineSimilarity();
-		// AbstractRecommenderSimilarity similarity = new JaccardSimilarity();
-		// AbstractRecommenderSimilarity similarity = new UPSSimilarity();
-		// HybirdSimilarity3 sim = new HybirdSimilarity3(similarity);
-		HybirdSimilarity2 sim = new HybirdSimilarity2(similarity);
-		sim.buildSimilarityMatrix(dataModel);
-		context.setSimilarity(sim);
+		// RecommenderSimilarity similarity = new PCCSimilarity();
+		RecommenderSimilarity similarity = new CosineSimilarity();
+		// RecommenderSimilarity similarity = new JaccardSimilarity();
+		// RecommenderSimilarity similarity = new UPSSimilarity();
+		similarity.buildSimilarityMatrix(dataModel);
+		context.setSimilarity(similarity);
 
 		// 在这里调用分组，由于我们使用的是AbstractRecommenderSimilarity，所以需要强制转换一下下
 		// UserClustering.invokeClustering(dataModel,
@@ -70,17 +57,17 @@ public class App {
 		// RecommenderEvaluator evaluator = new MAEEvaluator();
 		// RecommenderEvaluator evaluator = new RMSEEvaluator();
 		// System.out.println("MAE:" + recommender.evaluate(evaluator));
-
-		test(conf, context, "5");
-		test(conf, context, "10");
-		test(conf, context, "15");
-		test(conf, context, "20");
-		test(conf, context, "25");
-		test(conf, context, "30");
-		test(conf, context, "35");
-		test(conf, context, "40");
-		test(conf, context, "45");
-		test(conf, context, "50");
+		//
+		App.test(conf, context, "5");
+		App.test(conf, context, "10");
+		App.test(conf, context, "15");
+		App.test(conf, context, "20");
+		App.test(conf, context, "25");
+		App.test(conf, context, "30");
+		App.test(conf, context, "35");
+		App.test(conf, context, "40");
+		App.test(conf, context, "45");
+		App.test(conf, context, "50");
 
 		// App.testPrecision(conf, context, "5");
 		// App.testPrecision(conf, context, "10");
@@ -108,47 +95,5 @@ public class App {
 		// List recommendedItemList = recommender.getRecommendedList();
 		// RecommendedFilter filter = new GenericRecommendedFilter();
 		// recommendedItemList = filter.filter(recommendedItemList);
-	}
-
-	public static void test(Configuration conf, RecommenderContext context, String knn) throws Exception {
-		conf.set("rec.neighbors.knn.number", knn);
-		Recommender recommender = new UserKNNRecommender();
-		// 调用OPNUserKNNRecommonder
-		// Recommender recommender = new OPNUserKNNRecommender();
-		recommender.setContext(context);
-
-		recommender.recommend(context);
-
-		RecommenderEvaluator evaluator = new MAEEvaluator();
-		// RecommenderEvaluator evaluator = new RMSEEvaluator();
-		System.out.println(knn + "_MAE:" + recommender.evaluate(evaluator));
-	}
-
-	public static void testPrecision(Configuration conf, RecommenderContext context, String knn) throws Exception {
-		conf.set("rec.neighbors.knn.number", knn);
-		Recommender recommender = new UserKNNRecommender();
-		// 调用OPNUserKNNRecommonder
-		// Recommender recommender = new OPNUserKNNRecommender();
-		recommender.setContext(context);
-
-		recommender.recommend(context);
-
-		RecommenderEvaluator evaluator = new PrecisionEvaluator();
-		evaluator.setTopN(Integer.parseInt(knn));
-		System.out.println(knn + "_precision:" + recommender.evaluate(evaluator));
-	}
-
-	public static void testRecall(Configuration conf, RecommenderContext context, String knn) throws Exception {
-		conf.set("rec.neighbors.knn.number", knn);
-		Recommender recommender = new UserKNNRecommender();
-		// 调用OPNUserKNNRecommonder
-		// Recommender recommender = new OPNUserKNNRecommender();
-		recommender.setContext(context);
-
-		recommender.recommend(context);
-
-		RecommenderEvaluator evaluator = new RecallEvaluator();
-		evaluator.setTopN(Integer.parseInt(knn));
-		System.out.println(knn + "_recall:" + recommender.evaluate(evaluator));
 	}
 }

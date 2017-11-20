@@ -1,4 +1,4 @@
-package librec_test;
+package test;
 
 import common.PropertiesUtils;
 import net.librec.conf.Configuration;

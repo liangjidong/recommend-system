@@ -1,4 +1,4 @@
-package librec_test;
+package test;
 
 import java.io.FileOutputStream;
 import java.io.PrintStream;

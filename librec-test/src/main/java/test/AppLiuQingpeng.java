@@ -1,19 +1,29 @@
-package librec_test;
+package test;
 
 import common.PropertiesUtils;
+import common.UserClustering;
+import net.librec.common.LibrecException;
 import net.librec.conf.Configuration;
 import net.librec.data.model.TextDataModel;
 import net.librec.eval.RecommenderEvaluator;
 import net.librec.eval.ranking.PrecisionEvaluator;
 import net.librec.eval.ranking.RecallEvaluator;
 import net.librec.eval.rating.MAEEvaluator;
+import net.librec.eval.rating.RMSEEvaluator;
 import net.librec.math.algorithm.Randoms;
 import net.librec.recommender.Recommender;
 import net.librec.recommender.RecommenderContext;
 import net.librec.recommender.cf.UserKNNRecommender;
 import net.librec.similarity.AbstractRecommenderSimilarity;
 import net.librec.similarity.CosineSimilarity;
+import net.librec.similarity.JaccardSimilarity;
+import net.librec.similarity.PCCSimilarity;
+import net.librec.similarity.RecommenderSimilarity;
+import recommender.OPNUserKNNRecommender;
+import similarity.HybirdSimilarity;
+import similarity.HybirdSimilarity2;
 import similarity.HybirdSimilarityLIUQingpeng;
+import similarity.UPSSimilarity;
 
 /**
  * Hello world!
