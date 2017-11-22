@@ -1,29 +1,19 @@
 package test;
 
 import common.PropertiesUtils;
-import common.UserClustering;
-import net.librec.common.LibrecException;
 import net.librec.conf.Configuration;
 import net.librec.data.model.TextDataModel;
 import net.librec.eval.RecommenderEvaluator;
 import net.librec.eval.ranking.PrecisionEvaluator;
 import net.librec.eval.ranking.RecallEvaluator;
 import net.librec.eval.rating.MAEEvaluator;
-import net.librec.eval.rating.RMSEEvaluator;
 import net.librec.math.algorithm.Randoms;
 import net.librec.recommender.Recommender;
 import net.librec.recommender.RecommenderContext;
 import net.librec.recommender.cf.UserKNNRecommender;
 import net.librec.similarity.AbstractRecommenderSimilarity;
-import net.librec.similarity.CosineSimilarity;
-import net.librec.similarity.JaccardSimilarity;
 import net.librec.similarity.PCCSimilarity;
-import net.librec.similarity.RecommenderSimilarity;
-import recommender.OPNUserKNNRecommender;
-import similarity.HybirdSimilarity;
-import similarity.HybirdSimilarity2;
 import similarity.HybirdSimilarityLIUQingpeng;
-import similarity.UPSSimilarity;
 
 /**
  * Hello world!
@@ -31,12 +21,14 @@ import similarity.UPSSimilarity;
  */
 public class AppLiuQingpeng {
 	public static void main(String[] args) throws Exception {
+		String dirName = "Data_EXTRACT";
 		Configuration conf = new Configuration();
-		conf.set("dfs.data.dir", PropertiesUtils.mainDir);
-		conf.set("data.input.path", "trainData");
+		//对于classpath，需要先截取，然后才能使用
+		conf.set("dfs.data.dir", PropertiesUtils.resourcesDir);
+        conf.set("data.input.path", dirName);
 		conf.set("data.model.splitter", "testset");
-		// 预留的测试数据集应该在训练数据集的路径之下
-		conf.set("data.testset.path", "trainData/testData");
+        // 预留的测试数据集应该在训练数据集的路径之下
+        conf.set("data.testset.path", dirName + "/testData");
 		conf.set("data.model.format", "text");
 		conf.set("data.column.format", "UIRT");
 		conf.set("data.convert.binarize.threshold", "-1.0");
@@ -46,8 +38,8 @@ public class AppLiuQingpeng {
 		RecommenderContext context = new RecommenderContext(conf, dataModel);
 
 		conf.set("rec.recommender.similarity.key", "user");
-		// AbstractRecommenderSimilarity similarity = new PCCSimilarity();
-		AbstractRecommenderSimilarity similarity = new CosineSimilarity();
+		 AbstractRecommenderSimilarity similarity = new PCCSimilarity();
+//		AbstractRecommenderSimilarity similarity = new CosineSimilarity();
 		HybirdSimilarityLIUQingpeng sim = new HybirdSimilarityLIUQingpeng(similarity);
 		sim.buildSimilarityMatrix(dataModel);
 		context.setSimilarity(sim);

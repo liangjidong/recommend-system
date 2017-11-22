@@ -17,7 +17,7 @@ public class App1 {
 	public static void main(String[] args) throws Exception {
 		String dirName = "Data_EXTRACT";
 		Configuration conf = new Configuration();
-		conf.set("dfs.data.dir", PropertiesUtils.mainDir);
+		conf.set("dfs.data.dir", PropertiesUtils.resourcesDir);
 		conf.set("data.input.path", dirName);
 		conf.set("data.model.splitter", "testset");
 		// 预留的测试数据集应该在训练数据集的路径之下

@@ -1,6 +1,6 @@
 package recommender;
 
-import common.UserClustering;
+import cluster.UserClustering;
 import net.librec.common.LibrecException;
 import net.librec.math.structure.DenseVector;
 import net.librec.math.structure.SparseVector;

@@ -42,7 +42,6 @@ public class HybirdSimilarity2 extends AbstractRecommenderSimilarity {
      * 将传统的相似度算法和模式挖掘的用户分组结果传入
      *
      * @param baseSimilarity
-     * @param users
      */
     public HybirdSimilarity2(AbstractRecommenderSimilarity baseSimilarity) {
         super();
@@ -120,9 +119,11 @@ public class HybirdSimilarity2 extends AbstractRecommenderSimilarity {
      */
     @Override
     public void buildSimilarityMatrix(DataModel dataModel) {
+        //需要给conf赋值。
+        this.conf = dataModel.getContext().getConf();
         this.dataModel = dataModel;
         // 1,获取map,itemChanges
-        map = new ItemAssociateRuleMining().getItemSet(PropertiesUtils.testOutPath + "out_new1\\userArrayFianlly.txt");
+        map = new ItemAssociateRuleMining().getItemSet(PropertiesUtils.testOutPath + "out_new1/userArrayFianlly.txt");
         ItemChanges = getListOfInterestingItems(dataModel);
         // 2，根据map重新构造评分矩阵（包含预测评分）----核心部分
         SparseMatrix oldMatrix = dataModel.getDataSplitter().getTrainData();

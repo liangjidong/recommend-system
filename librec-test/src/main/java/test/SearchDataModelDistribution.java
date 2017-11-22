@@ -1,7 +1,5 @@
 package test;
 
-import java.util.Arrays;
-
 import common.PropertiesUtils;
 import net.librec.common.LibrecException;
 import net.librec.conf.Configuration;
@@ -14,7 +12,7 @@ public class SearchDataModelDistribution {
 	public static void main(String[] args) throws LibrecException {
 		String dirName = "Data_EXTRACT";
 		Configuration conf = new Configuration();
-		conf.set("dfs.data.dir", PropertiesUtils.mainDir);
+		conf.set("dfs.data.dir", PropertiesUtils.resourcesDir);
 		conf.set("data.input.path", dirName);
 		conf.set("data.model.splitter", "testset");
 		// 预留的测试数据集应该在训练数据集的路径之下

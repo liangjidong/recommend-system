@@ -12,7 +12,6 @@ import net.librec.recommender.cf.UserKNNRecommender;
 import net.librec.similarity.AbstractRecommenderSimilarity;
 import net.librec.similarity.PCCSimilarity;
 import similarity.HybirdSimilarity3;
-import similarity.UPSSimilarity;
 
 /**
  * 修正的pcc相似度计算方法在数据集二上的结果
@@ -22,7 +21,7 @@ public class App3 {
 	public static void main(String[] args) throws Exception {
 		String dirName = "Data_EXTRACT";
 		Configuration conf = new Configuration();
-		conf.set("dfs.data.dir", PropertiesUtils.mainDir);
+		conf.set("dfs.data.dir", PropertiesUtils.resourcesDir);
 		conf.set("data.input.path", dirName);
 		conf.set("data.model.splitter", "testset");
 		// 预留的测试数据集应该在训练数据集的路径之下

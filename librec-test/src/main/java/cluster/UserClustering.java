@@ -1,15 +1,13 @@
-package common;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+package cluster;
 
 import net.librec.data.DataModel;
 import net.librec.math.structure.SparseMatrix;
 import net.librec.math.structure.SparseVector;
 import net.librec.math.structure.SymmMatrix;
 import net.librec.similarity.AbstractRecommenderSimilarity;
-import net.librec.similarity.RecommenderSimilarity;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class UserClustering {
 	private static final float alph = 4.0f;

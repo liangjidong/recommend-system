@@ -1,6 +1,7 @@
 package test;
 
 import common.PropertiesUtils;
+import cluster.UserClustering;
 import net.librec.conf.Configuration;
 import net.librec.data.model.TextDataModel;
 import net.librec.eval.RecommenderEvaluator;
@@ -13,6 +14,7 @@ import net.librec.recommender.RecommenderContext;
 import net.librec.recommender.cf.UserKNNRecommender;
 import net.librec.similarity.AbstractRecommenderSimilarity;
 import net.librec.similarity.PCCSimilarity;
+import recommender.OPNUserKNNRecommender;
 import similarity.HybirdSimilarity2;
 
 /**
@@ -22,11 +24,10 @@ public class App {
     public static void main(String[] args) throws Exception {
         String dirName = "Data_EXTRACT";
         Configuration conf = new Configuration();
-        String dataDir = PropertiesUtils.resourcesDir.substring(6, PropertiesUtils.resourcesDir.length() - 1);
-        conf.set("dfs.data.dir", dataDir);
+        conf.set("dfs.data.dir", PropertiesUtils.resourcesDir);
         conf.set("data.input.path", dirName);
         conf.set("data.model.splitter", "testset");
-        // 预留的测试数据集应该在训练数据集的路径之下
+        // 预留的测试数据集应该在训练数据集的路径之下(好像不是)
         conf.set("data.testset.path", dirName + "/testData");
         conf.set("data.model.format", "text");
         conf.set("data.column.format", "UIRT");
@@ -112,9 +113,11 @@ public class App {
 
     public static void test(Configuration conf, RecommenderContext context, String knn) throws Exception {
         conf.set("rec.neighbors.knn.number", knn);
-        Recommender recommender = new UserKNNRecommender();
+        //Recommender recommender = new UserKNNRecommender();
         // 调用OPNUserKNNRecommonder
-        // Recommender recommender = new OPNUserKNNRecommender();
+        UserClustering.invokeClustering(context.getDataModel(),
+                (AbstractRecommenderSimilarity) context.getSimilarity());
+        Recommender recommender = new OPNUserKNNRecommender();
         recommender.setContext(context);
 
         recommender.recommend(context);
