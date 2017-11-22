@@ -14,7 +14,7 @@ public class PropertiesUtils {
      * mahout关联规则挖掘的结果存放的路径+相关中间结果存放的路径：testout
      */
     public static final String TEST_OUT_PATH_LINUX = "/home/ljd/testout/";
-    public static final String TEST_OUT_PATH_WINDOWS = "C:\\Users\\ljd\\Desktop\\论文相关--开题报告--梁继东\\testout\\";
+    public static final String TEST_OUT_PATH_WINDOWS = "C:\\Users\\ljd\\Desktop\\testout\\";
     public static final String testOutPath;
 
     static {
