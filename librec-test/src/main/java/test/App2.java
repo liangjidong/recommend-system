@@ -31,15 +31,6 @@ public class App2 {
 		Randoms.seed(1);
 		TextDataModel dataModel = new TextDataModel(conf);
 		dataModel.buildDataModel();
-		// 打印出dataModel
-		// 获取训练集合
-		// SparseMatrix trainMatrix =
-		// dataModel.getDataSplitter().getTrainData();
-		// int numUsers = trainMatrix.numRows();
-		// for (int i = 0; i < numUsers; i++) {
-		// SparseVector thisVector = trainMatrix.row(i);
-		// System.out.println(thisVector);
-		// }
 
 		RecommenderContext context = new RecommenderContext(conf, dataModel);
 

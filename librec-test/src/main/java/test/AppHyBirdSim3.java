@@ -6,14 +6,17 @@ import net.librec.conf.Configuration;
 import net.librec.data.model.TextDataModel;
 import net.librec.math.algorithm.Randoms;
 import net.librec.recommender.RecommenderContext;
+import net.librec.similarity.AbstractRecommenderSimilarity;
 import net.librec.similarity.PCCSimilarity;
-import net.librec.similarity.RecommenderSimilarity;
+import similarity.HybirdSimilarity3;
 
-public class AppTraditional {
+/**
+ * Created by author on 17-11-23.
+ */
+public class AppHyBirdSim3 {
     public static void main(String[] args) throws Exception {
         String dirName = "Data_EXTRACT";
         Configuration conf = new Configuration();
-        //对于classpath，需要先截取，然后才能使用
         conf.set("dfs.data.dir", PropertiesUtils.resourcesDir);
         conf.set("data.input.path", dirName);
         conf.set("data.model.splitter", "testset");
@@ -29,12 +32,13 @@ public class AppTraditional {
         RecommenderContext context = new RecommenderContext(conf, dataModel);
 
         conf.set("rec.recommender.similarity.key", "user");
-        RecommenderSimilarity similarity = new PCCSimilarity();
-//		RecommenderSimilarity similarity = new CosineSimilarity();
-        // RecommenderSimilarity similarity = new JaccardSimilarity();
+        AbstractRecommenderSimilarity similarity = new PCCSimilarity();
+        // RecommenderSimilarity similarity = new CosineSimilarity();
+        // AbstractRecommenderSimilarity similarity = new UPSSimilarity();
         // RecommenderSimilarity similarity = new UPSSimilarity();
-        similarity.buildSimilarityMatrix(dataModel);
-        context.setSimilarity(similarity);
+        HybirdSimilarity3 sim = new HybirdSimilarity3(similarity);
+        sim.buildSimilarityMatrix(dataModel);
+        context.setSimilarity(sim);
 
         RecommendTestUtils.testMAE(conf, context, "5");
         RecommendTestUtils.testMAE(conf, context, "10");

@@ -22,7 +22,7 @@ import net.librec.similarity.AbstractRecommenderSimilarity;
 import patternMining.ItemAssociateRuleMining;
 
 public class HybirdSimilarity3 extends AbstractRecommenderSimilarity {
-    private String associateRulePath = PropertiesUtils.testOutPath + "out_new1\\userArrayFianlly.txt";
+    private String associateRulePath = PropertiesUtils.testOutPath + "out_new1/userArrayFianlly.txt";
     private static final double MIN_RATE = 1.0;
     private static final double MAX_RATE = 5.0;
     private DataModel dataModel;
