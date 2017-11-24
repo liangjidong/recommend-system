@@ -138,13 +138,11 @@ public class ItemAssociateRuleMining {
         br = new BufferedReader(new InputStreamReader(new FileInputStream(filePath), "UTF-8"));
         String line = null;
         while ((line = br.readLine()) != null) {
-            int start = line.indexOf('[');
-            int end = line.indexOf(']');
-            System.out.print(line.substring(start + 1, end));
+            line = line.replace("[", "").replace("]", "");
+            int start = line.lastIndexOf(',');
+            System.out.print(line.substring(line.indexOf('(') + 1, start));
             System.out.print("|");
-            start = line.lastIndexOf(',');
-            end = line.indexOf(')');
-            System.out.println(line.substring(start + 1, end));
+            System.out.println(line.substring(start + 1, line.indexOf(')')));
         }
         br.close();
 
@@ -154,12 +152,19 @@ public class ItemAssociateRuleMining {
      * 外部id转为内部id
      */
     public int changeOutIdToInnerId(int id, DataModel dataModel) {
+        int ans = 0;
         BiMap<String, Integer> itemMappingData = dataModel.getItemMappingData();
-        id = itemMappingData.get(id + "");
-        return id;
+        ans = itemMappingData.get(Math.abs(id) + "");
+        ans += 1;
+        if (id < 0) {
+            ans = -ans;
+        }
+        return ans;
     }
 
     public static void main(String[] args) throws Exception {
+        // String s = "[asdf[[[[asdf]";
+        //System.out.println(s.replace("[", "").replace("]", ""));
         PrintStream out = System.out;
         arrayOut(PropertiesUtils.testOutPath + "userArray.txt", PropertiesUtils.testOutPath + "userArrayFianlly.txt");
         System.setOut(out);

@@ -80,6 +80,9 @@ public class HybirdSimilarity3 extends AbstractRecommenderSimilarity {
         // 1,获取map,itemChanges,（应该错了，内部编号和外部编号不同，需要将外部编号和内部编号统一，已经实现）
         map = new ItemAssociateRuleMining().getItemSet(associateRulePath, dataModel);
 
+        System.out.println(map.get(1));
+        System.out.println(map.get(-1));
+
         ItemChanges = getListOfInterestingItems(dataModel);
         // 2，根据map重新构造评分矩阵（包含预测评分）----核心部分
         SparseMatrix oldMatrix = dataModel.getDataSplitter().getTrainData();
