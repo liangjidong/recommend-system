@@ -9,6 +9,9 @@ import patternMining.NeighborMining;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
 
+/**
+ * 测试参考的一篇论文 <strong>A pattern mining approach to enhance the accuracy of collaborative filtering in sparse data domains</strong>
+ */
 public class MiningTest {
     public static final String PATHDIR = PropertiesUtils.testOutPath;
 

@@ -12,9 +12,11 @@ public class PropertiesUtils {
 
     /**
      * mahout关联规则挖掘的结果存放的路径+相关中间结果存放的路径：testout
+     * out_new :SML1M
+     * out_new1:ML100K
      */
-    public static final String TEST_OUT_PATH_LINUX = "/home/ljd/testout/";
-    public static final String TEST_OUT_PATH_WINDOWS = "C:\\Users\\ljd\\Desktop\\testout\\";
+    public static final String TEST_OUT_PATH_LINUX = "/home/ljd/testout/out_new1/";
+    public static final String TEST_OUT_PATH_WINDOWS = "C:\\Users\\ljd\\Desktop\\testout\\out_new1\\";
     public static final String testOutPath;
 
     static {

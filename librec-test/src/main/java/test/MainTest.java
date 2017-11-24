@@ -10,7 +10,7 @@ import net.librec.similarity.AbstractRecommenderSimilarity;
 import net.librec.similarity.PCCSimilarity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import similarity.HybirdSimilarity;
+import similarity.HybirdSimilarity3;
 
 /**
  * Created by author on 17-11-23.
@@ -90,12 +90,13 @@ public class MainTest {
         conf.set("data.convert.binarize.threshold", "-1.0");
         conf.set("rec.recommender.similarity.key", "user");
         Randoms.seed(1);
-        // AbstractRecommenderSimilarity similarity = new PCCSimilarity();
         AbstractRecommenderSimilarity similarity = new PCCSimilarity();
         // RecommenderSimilarity similarity = new CosineSimilarity();
         // AbstractRecommenderSimilarity similarity = new UPSSimilarity();
         // RecommenderSimilarity similarity = new UPSSimilarity();
-        similarity = new HybirdSimilarity(similarity);
+        HybirdSimilarity3 hybirdSimilarity3 = new HybirdSimilarity3(similarity);
+        hybirdSimilarity3.setAssociateRulePath(PropertiesUtils.testOutPath + "userArrayFianlly.txt");
+        similarity = hybirdSimilarity3;
         MainTest test = new MainTest(conf, similarity);
         test.test();
     }

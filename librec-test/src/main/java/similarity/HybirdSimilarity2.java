@@ -123,7 +123,7 @@ public class HybirdSimilarity2 extends AbstractRecommenderSimilarity {
         this.conf = dataModel.getContext().getConf();
         this.dataModel = dataModel;
         // 1,获取map,itemChanges
-        map = new ItemAssociateRuleMining().getItemSet(PropertiesUtils.testOutPath + "out_new1/userArrayFianlly.txt");
+        map = new ItemAssociateRuleMining().getItemSet(PropertiesUtils.testOutPath + "out_new1/userArrayFianlly.txt", dataModel);
         ItemChanges = getListOfInterestingItems(dataModel);
         // 2，根据map重新构造评分矩阵（包含预测评分）----核心部分
         SparseMatrix oldMatrix = dataModel.getDataSplitter().getTrainData();

@@ -1,18 +1,9 @@
 package similarity;
 
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Table;
-
 import common.PropertiesUtils;
 import net.librec.data.DataModel;
 import net.librec.math.structure.SparseMatrix;
@@ -21,8 +12,12 @@ import net.librec.math.structure.SymmMatrix;
 import net.librec.similarity.AbstractRecommenderSimilarity;
 import patternMining.ItemAssociateRuleMining;
 
+import java.lang.reflect.Field;
+import java.util.*;
+
 public class HybirdSimilarity3 extends AbstractRecommenderSimilarity {
-    private String associateRulePath = PropertiesUtils.testOutPath + "out_new1/userArrayFianlly.txt";
+    //应该由外部提供
+    private String associateRulePath = PropertiesUtils.testOutPath + "userArrayFianlly.txt";
     private static final double MIN_RATE = 1.0;
     private static final double MAX_RATE = 5.0;
     private DataModel dataModel;
@@ -47,7 +42,6 @@ public class HybirdSimilarity3 extends AbstractRecommenderSimilarity {
      * 将传统的相似度算法和模式挖掘的用户分组结果传入
      *
      * @param baseSimilarity
-     * @param users
      */
     public HybirdSimilarity3(AbstractRecommenderSimilarity baseSimilarity) {
         super();
@@ -61,52 +55,19 @@ public class HybirdSimilarity3 extends AbstractRecommenderSimilarity {
         this.baseSimilarity = baseSimilarity;
     }
 
+    /**
+     * 设置模式挖掘文件路径:默认 {@code PropertiesUtils.testOutPath + "userArrayFianlly.txt"}
+     *
+     * @param associateRulePath
+     */
+    public void setAssociateRulePath(String associateRulePath) {
+        this.associateRulePath = associateRulePath;
+    }
+
     @Override
     protected double getSimilarity(List<? extends Number> thisList, List<? extends Number> thatList) {
         // TODO Auto-generated method stub
         return 0;
-    }
-
-    /**
-     * 计算项目的 DU(degree of uncertain)，然后计算项目之间的影响因子gx
-     */
-    private void calculateDU(SparseMatrix matrix) {
-        DU = new double[matrix.numColumns];
-        int length = ((int) (MAX_RATE - MIN_RATE)) + 1;
-        double[] p = new double[length];
-        int[] count = new int[length];
-        for (int i = 0; i < matrix.numColumns; i++) {
-            SparseVector column = matrix.column(i);
-            Arrays.fill(count, 0);
-            Arrays.fill(p, 0);
-            for (int j = 0; j < matrix.numRows; j++) {
-                if (column.get(j) == 0)
-                    continue;
-                count[(int) (column.get(j) - MIN_RATE)]++;
-            }
-            for (int j = 0; j < count.length; j++) {
-                p[j] = count[j] * 1.0 / column.getCount();
-                // System.out.println(p[j]);
-            }
-            double sum = 0.0;
-            double log2 = Math.log(2.0);
-            for (int j = 0; j < p.length; j++) {
-                if (p[j] == 0.0)
-                    continue;
-                sum += p[j] * (Math.log(p[j]) / log2);
-            }
-            DU[i] = -sum / column.getCount();
-            // System.out.println("sum=" + sum + " " + "DU[" + i + "]=" +
-            // DU[i]);
-        }
-        double max = 0;
-        gx = new double[matrix.numColumns][matrix.numColumns];
-        for (int i = 0; i < matrix.numColumns; i++) {
-            for (int j = i + 1; j < matrix.numColumns; j++) {
-                // gx[i][j] = 1.0 / (1.0 - Math.exp(-Math.abs(DU[i] - DU[j])));
-                gx[i][j] = Math.exp(-Math.abs(DU[i] - DU[j]));
-            }
-        }
     }
 
     /**
@@ -116,8 +77,9 @@ public class HybirdSimilarity3 extends AbstractRecommenderSimilarity {
     @Override
     public void buildSimilarityMatrix(DataModel dataModel) {
         this.dataModel = dataModel;
-        // 1,获取map,itemChanges
-        map = new ItemAssociateRuleMining().getItemSet(associateRulePath);
+        // 1,获取map,itemChanges,（应该错了，内部编号和外部编号不同，需要将外部编号和内部编号统一，已经实现）
+        map = new ItemAssociateRuleMining().getItemSet(associateRulePath, dataModel);
+
         ItemChanges = getListOfInterestingItems(dataModel);
         // 2，根据map重新构造评分矩阵（包含预测评分）----核心部分
         SparseMatrix oldMatrix = dataModel.getDataSplitter().getTrainData();
@@ -215,6 +177,7 @@ public class HybirdSimilarity3 extends AbstractRecommenderSimilarity {
         }
 
     }
+
 
     private double predictRate(SparseMatrix oldMatrix, int userId, int itemId) {
         // 计算目标项目itemId的用户优化评分ra
