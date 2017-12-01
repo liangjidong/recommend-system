@@ -1,12 +1,11 @@
 package test;
 
-import common.PropertiesUtils;
 import cluster.UserClustering;
+import common.PropertiesUtils;
 import net.librec.conf.Configuration;
 import net.librec.data.model.TextDataModel;
 import net.librec.eval.RecommenderEvaluator;
 import net.librec.eval.ranking.PrecisionEvaluator;
-import net.librec.eval.ranking.RecallEvaluator;
 import net.librec.eval.rating.MAEEvaluator;
 import net.librec.math.algorithm.Randoms;
 import net.librec.recommender.Recommender;
@@ -141,17 +140,5 @@ public class App {
         System.out.println(knn + "_precision:" + recommender.evaluate(evaluator));
     }
 
-    public static void testRecall(Configuration conf, RecommenderContext context, String knn) throws Exception {
-        conf.set("rec.neighbors.knn.number", knn);
-        Recommender recommender = new UserKNNRecommender();
-        // 调用OPNUserKNNRecommonder
-        // Recommender recommender = new OPNUserKNNRecommender();
-        recommender.setContext(context);
 
-        recommender.recommend(context);
-
-        RecommenderEvaluator evaluator = new RecallEvaluator();
-        evaluator.setTopN(Integer.parseInt(knn));
-        System.out.println(knn + "_recall:" + recommender.evaluate(evaluator));
-    }
 }

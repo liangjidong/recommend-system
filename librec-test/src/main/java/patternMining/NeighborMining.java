@@ -1,8 +1,6 @@
 package patternMining;
 
 import net.librec.data.model.TextDataModel;
-import net.librec.math.structure.SparseMatrix;
-import net.librec.math.structure.SparseVector;
 
 import java.util.*;
 
@@ -26,33 +24,6 @@ public class NeighborMining {
         super();
         this.dataModel = dataModel;
         // dataModel.dataSplitter.getTrainData().getRows(col)
-    }
-
-    // 1，评分预处理
-    public List<int[]> getListOfInterestingItems() {
-        List<int[]> ans = new ArrayList<>();
-        SparseMatrix trainMatrix = dataModel.getDataSplitter().getTrainData();
-        // 获取所有用户
-        // trainData.
-        int count = trainMatrix.numRows();
-        int[] temp;
-        for (int i = 0; i < count; i++) {
-            SparseVector interest = trainMatrix.row(i);
-            if (interest.getCount() == 0)
-                continue;
-            temp = new int[interest.getCount()];
-            int index = 0;
-            for (Integer idx : interest.getIndex()) {
-                if (interest.get(idx) >= 3) {
-                    temp[index++] = (idx + 1);
-                } else {
-                    temp[index++] = -(idx + 1);
-                }
-            }
-            Arrays.sort(temp);
-            ans.add(temp);
-        }
-        return ans;
     }
 
     // 2,求交集并将交集进行求包
@@ -191,7 +162,7 @@ public class NeighborMining {
     }
 
     public void command() {
-        List<int[]> listOfInterestingItems = getListOfInterestingItems();
+        List<int[]> listOfInterestingItems = ItemScorePreprocess.getListOfInterestingItems(dataModel);
         for (int[] ls : listOfInterestingItems) {
             System.out.println(Arrays.toString(ls));
         }

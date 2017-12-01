@@ -11,6 +11,7 @@ import net.librec.math.structure.SparseVector;
 import net.librec.math.structure.SymmMatrix;
 import net.librec.similarity.AbstractRecommenderSimilarity;
 import patternMining.ItemAssociateRuleMining;
+import patternMining.ItemScorePreprocess;
 
 import java.lang.reflect.Field;
 import java.util.*;
@@ -119,9 +120,9 @@ public class HybirdSimilarity extends AbstractRecommenderSimilarity {
     public void buildSimilarityMatrix(DataModel dataModel) {
         this.dataModel = dataModel;
         // 1,获取map,itemChanges
-        map = new ItemAssociateRuleMining()
-                .getItemSet(PropertiesUtils.testOutPath + "out_new1/userArrayFianlly.txt", dataModel);
-        ItemChanges = getListOfInterestingItems(dataModel);
+        map = new ItemAssociateRuleMining(2)
+                .getItemSet(PropertiesUtils.testOutPath + "out_new1/userArrayFianlly.txt");
+        ItemChanges = ItemScorePreprocess.getListOfInterestingItems(dataModel);
         // 2，根据map重新构造评分矩阵（包含预测评分）----核心部分
         SparseMatrix oldMatrix = dataModel.getDataSplitter().getTrainData();
         // 计算DU
@@ -340,33 +341,6 @@ public class HybirdSimilarity extends AbstractRecommenderSimilarity {
         // }
         return rBase - tempLow * (rBase - minRate) + tempHigh * (maxRate - rBase);
 
-    }
-
-    // ，评分预处理
-    public List<int[]> getListOfInterestingItems(DataModel dataModel) {
-        List<int[]> ans = new ArrayList<>();
-        SparseMatrix trainMatrix = dataModel.getDataSplitter().getTrainData();
-        // 获取所有用户
-        // trainData.
-        int count = trainMatrix.numRows();
-        int[] temp;
-        for (int i = 0; i < count; i++) {
-            SparseVector interest = trainMatrix.row(i);
-            if (interest.getCount() == 0)
-                continue;
-            temp = new int[interest.getCount()];
-            int index = 0;
-            for (Integer idx : interest.getIndex()) {
-                if (interest.get(idx) >= 3) {
-                    temp[index++] = (idx + 1);
-                } else {
-                    temp[index++] = -(idx + 1);
-                }
-            }
-            Arrays.sort(temp);
-            ans.add(temp);
-        }
-        return ans;
     }
 
     private double getArrayMax(double[] array) {

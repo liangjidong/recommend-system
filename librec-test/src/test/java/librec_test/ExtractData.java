@@ -8,6 +8,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 
+/**
+ * 用于从ML1M中筛选出特定比例数据集Data_EXTRACT
+ */
 public class ExtractData {
 	private static final String PARENT_PATH = "C:\\Users\\ljd\\Desktop\\论文相关--开题报告--梁继东\\data\\";
 

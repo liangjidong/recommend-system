@@ -11,11 +11,14 @@ import net.librec.math.structure.SparseVector;
 import net.librec.math.structure.SymmMatrix;
 import net.librec.similarity.AbstractRecommenderSimilarity;
 import patternMining.ItemAssociateRuleMining;
+import patternMining.ItemScorePreprocess;
 
 import java.lang.reflect.Field;
 import java.util.*;
 
 public class HybirdSimilarity2 extends AbstractRecommenderSimilarity {
+    //应该由外部提供
+    private String associateRulePath = PropertiesUtils.testOutPath + "userArrayFianlly.txt";
     private static final double MIN_RATE = 1.0;
     private static final double MAX_RATE = 5.0;
     private static final double MID_RATE = 3.0;
@@ -53,6 +56,15 @@ public class HybirdSimilarity2 extends AbstractRecommenderSimilarity {
         this.maxRate = maxRate;
         this.minRate = minRate;
         this.baseSimilarity = baseSimilarity;
+    }
+
+    /**
+     * 设置模式挖掘文件路径:默认 {@code PropertiesUtils.testOutPath + "userArrayFianlly.txt"}
+     *
+     * @param associateRulePath
+     */
+    public void setAssociateRulePath(String associateRulePath) {
+        this.associateRulePath = associateRulePath;
     }
 
     @Override
@@ -123,8 +135,8 @@ public class HybirdSimilarity2 extends AbstractRecommenderSimilarity {
         this.conf = dataModel.getContext().getConf();
         this.dataModel = dataModel;
         // 1,获取map,itemChanges
-        map = new ItemAssociateRuleMining().getItemSet(PropertiesUtils.testOutPath + "out_new1/userArrayFianlly.txt", dataModel);
-        ItemChanges = getListOfInterestingItems(dataModel);
+        map = new ItemAssociateRuleMining(2).getItemSet(associateRulePath);
+        ItemChanges = ItemScorePreprocess.getListOfInterestingItems(dataModel);
         // 2，根据map重新构造评分矩阵（包含预测评分）----核心部分
         SparseMatrix oldMatrix = dataModel.getDataSplitter().getTrainData();
         // 计算DU
@@ -327,32 +339,7 @@ public class HybirdSimilarity2 extends AbstractRecommenderSimilarity {
         // - midRate);
     }
 
-    // ，评分预处理
-    public List<int[]> getListOfInterestingItems(DataModel dataModel) {
-        List<int[]> ans = new ArrayList<>();
-        SparseMatrix trainMatrix = dataModel.getDataSplitter().getTrainData();
-        // 获取所有用户
-        // trainData.
-        int count = trainMatrix.numRows();
-        int[] temp;
-        for (int i = 0; i < count; i++) {
-            SparseVector interest = trainMatrix.row(i);
-            if (interest.getCount() == 0)
-                continue;
-            temp = new int[interest.getCount()];
-            int index = 0;
-            for (Integer idx : interest.getIndex()) {
-                if (interest.get(idx) >= 3) {
-                    temp[index++] = (idx + 1);
-                } else {
-                    temp[index++] = -(idx + 1);
-                }
-            }
-            Arrays.sort(temp);
-            ans.add(temp);
-        }
-        return ans;
-    }
+
 
     private double getArrayMax(double[] array) {
         if (array == null || array.length == 0)
