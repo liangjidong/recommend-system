@@ -35,6 +35,7 @@ public class PropertiesUtils {
      * 生成DataModel,在不同数据集切换的时候需要将该字段修改
      */
     public static final String DATA_MODEL_NAME = "Data_EXTRACT";
+//    public static final String DATA_MODEL_NAME = "Data_ML100K";
     public static final DataModel dataModel;
 
     private static DataModel generateDataMode(String dataModelName) {

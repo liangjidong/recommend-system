@@ -5,7 +5,7 @@ import common.RecommendTestUtils;
 import net.librec.data.DataModel;
 import net.librec.recommender.RecommenderContext;
 import net.librec.similarity.AbstractRecommenderSimilarity;
-import net.librec.similarity.PCCSimilarity;
+import net.librec.similarity.CosineSimilarity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import similarity.HybirdSimilarity3;
@@ -32,9 +32,23 @@ public class MainTest {
 
         //测试一些指标,可以自己重写，默认只实现MAE，测试5-50之间的分组
         //testMAE(dataModel);
-        testRMSE(dataModel);
-        testRecall(dataModel);
-        testPrecision(dataModel);
+        //testRMSE(dataModel);
+        //testRecall(dataModel);
+        //testPrecision(dataModel);
+        try {
+            RecommendTestUtils.test(dataModel.getContext().getConf(), context, "5");
+            RecommendTestUtils.test(dataModel.getContext().getConf(), context, "10");
+            RecommendTestUtils.test(dataModel.getContext().getConf(), context, "15");
+            RecommendTestUtils.test(dataModel.getContext().getConf(), context, "20");
+            RecommendTestUtils.test(dataModel.getContext().getConf(), context, "25");
+            RecommendTestUtils.test(dataModel.getContext().getConf(), context, "30");
+            RecommendTestUtils.test(dataModel.getContext().getConf(), context, "35");
+            RecommendTestUtils.test(dataModel.getContext().getConf(), context, "40");
+            RecommendTestUtils.test(dataModel.getContext().getConf(), context, "45");
+            RecommendTestUtils.test(dataModel.getContext().getConf(), context, "50");
+        } catch (Exception e) {
+            logger.error("测试指标异常", e);
+        }
     }
 
     protected void testPrecision(DataModel dataModel) {
@@ -79,8 +93,8 @@ public class MainTest {
     }
 
     public static void main(String[] args) {
-        AbstractRecommenderSimilarity similarity = new PCCSimilarity();
-//        AbstractRecommenderSimilarity similarity = new CosineSimilarity();
+//        AbstractRecommenderSimilarity similarity = new PCCSimilarity();
+        AbstractRecommenderSimilarity similarity = new CosineSimilarity();
 //         AbstractRecommenderSimilarity similarity = new UPSSimilarity();
         // RecommenderSimilarity similarity = new UPSSimilarity();
         HybirdSimilarity3 hybirdSimilarity = new HybirdSimilarity3(similarity);
