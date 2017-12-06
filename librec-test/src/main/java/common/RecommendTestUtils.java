@@ -13,6 +13,7 @@ import net.librec.recommender.Recommender;
 import net.librec.recommender.RecommenderContext;
 import net.librec.recommender.cf.UserKNNRecommender;
 import net.librec.similarity.AbstractRecommenderSimilarity;
+import pojo.ExperimentResult;
 import recommender.KMeansKNNRecommender;
 
 /**
@@ -20,7 +21,8 @@ import recommender.KMeansKNNRecommender;
  */
 public class RecommendTestUtils {
 
-    public static void test(Configuration conf, RecommenderContext context, String knn) throws LibrecException {
+    public static ExperimentResult test(Configuration conf, RecommenderContext context, String knn) throws LibrecException {
+        double mae = 0, precision = 0, recall = 0;
         conf.set("rec.neighbors.knn.number", knn);
         Recommender recommender = new UserKNNRecommender();
         recommender.setContext(context);
@@ -30,7 +32,7 @@ public class RecommendTestUtils {
         recommender.recommend(context);
         //MAE
         RecommenderEvaluator evaluator = new MAEEvaluator();
-        System.out.println(knn + "_MAE:" + recommender.evaluate(evaluator));
+        System.out.println(knn + "_MAE:" + (mae = recommender.evaluate(evaluator)));
 
         //=====ranking eval===============
 //        conf.getBoolean("rec.recommender.isranking");
@@ -41,12 +43,18 @@ public class RecommendTestUtils {
         //Precision
         evaluator = new MyPrecisionEvaluator();
         evaluator.setTopN(20);
-        System.out.println(knn + "_Precision:" + recommender.evaluate(evaluator));
+        System.out.println(knn + "_Precision:" + (precision = recommender.evaluate(evaluator)));
         //Recall
         evaluator = new MyRecallEvaluator();
         evaluator.setTopN(20);
-        System.out.println(knn + "_recall:" + recommender.evaluate(evaluator));
+        System.out.println(knn + "_recall:" + (recall = recommender.evaluate(evaluator)));
         //Coverage
+
+        ExperimentResult result = new ExperimentResult();
+        result.setMae(mae);
+        result.setPrecision(precision);
+        result.setRecall(recall);
+        return result;
     }
 
     public static void testMAE(Configuration conf, RecommenderContext context, String knn) throws Exception {

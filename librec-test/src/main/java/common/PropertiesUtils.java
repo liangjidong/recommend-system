@@ -23,19 +23,22 @@ public class PropertiesUtils {
      */
     /*public static final String TEST_OUT_PATH_LINUX = "/home/ljd/testout/out_new1/";
     public static final String TEST_OUT_PATH_WINDOWS = "C:\\Users\\ljd\\Desktop\\testout\\out_new1\\";*/
-   /* //ML100K
+    //ML100K
     public static final String TEST_OUT_PATH_LINUX = "/home/ljd/testout/out_ML100K/";
-    public static final String TEST_OUT_PATH_WINDOWS = "C:\\Users\\ljd\\Desktop\\testout\\out_ML100K\\";*/
-    //SML1M
+    public static final String TEST_OUT_PATH_WINDOWS = "C:\\Users\\ljd\\Desktop\\testout\\out_ML100K\\";
+    /*//SML1M
     public static final String TEST_OUT_PATH_LINUX = "/home/ljd/testout/out_SML1M/";
-    public static final String TEST_OUT_PATH_WINDOWS = "C:\\Users\\ljd\\Desktop\\testout\\out_SML1M\\";
+    public static final String TEST_OUT_PATH_WINDOWS = "C:\\Users\\ljd\\Desktop\\testout\\out_SML1M\\";*/
+    /*//SML1M_2
+    public static final String TEST_OUT_PATH_LINUX = "/home/ljd/testout/out_SML1M_2/";
+    public static final String TEST_OUT_PATH_WINDOWS = "C:\\Users\\ljd\\Desktop\\testout\\out_SML1M_2\\";*/
     public static final String testOutPath;
 
     /**
      * 生成DataModel,在不同数据集切换的时候需要将该字段修改
      */
-    public static final String DATA_MODEL_NAME = "Data_EXTRACT";
-//    public static final String DATA_MODEL_NAME = "Data_ML100K";
+//    public static final String DATA_MODEL_NAME = "Data_SML1M_2";
+    public static final String DATA_MODEL_NAME = "Data_ML100K";
     public static final DataModel dataModel;
 
     private static DataModel generateDataMode(String dataModelName) {

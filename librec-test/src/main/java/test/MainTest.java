@@ -1,13 +1,16 @@
 package test;
 
+import common.ExcelUtils;
 import common.PropertiesUtils;
 import common.RecommendTestUtils;
 import net.librec.data.DataModel;
 import net.librec.recommender.RecommenderContext;
 import net.librec.similarity.AbstractRecommenderSimilarity;
-import net.librec.similarity.CosineSimilarity;
+import net.librec.similarity.PCCSimilarity;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import pojo.ExperimentResult;
 import similarity.HybirdSimilarity3;
 
 /**
@@ -24,84 +27,56 @@ public class MainTest {
         this.similarity = similarity;
     }
 
+
+    //每次执行test,都要将结果写入excle中
     public void test() {
         DataModel dataModel = PropertiesUtils.dataModel;
         context = new RecommenderContext(dataModel.getContext().getConf(), dataModel);
         similarity.buildSimilarityMatrix(dataModel);
         context.setSimilarity(similarity);
+        String excelFileName = null;
+        if (similarity instanceof HybirdSimilarity3) {
+            excelFileName = "/home/ljd/testout/excel_" + ((HybirdSimilarity3) similarity).getLen() + ".xls";
+        } else {
+            excelFileName = "/home/ljd/testout/excel.xls";
+        }
+        String sheetName = "out";
+        String[] title = {"", "MAE", "Precision", "Recall"};
+        //5-50,共10行
+        String[][] values = new String[10][title.length];
 
-        //测试一些指标,可以自己重写，默认只实现MAE，测试5-50之间的分组
-        //testMAE(dataModel);
-        //testRMSE(dataModel);
-        //testRecall(dataModel);
-        //testPrecision(dataModel);
         try {
-            RecommendTestUtils.test(dataModel.getContext().getConf(), context, "5");
-            RecommendTestUtils.test(dataModel.getContext().getConf(), context, "10");
-            RecommendTestUtils.test(dataModel.getContext().getConf(), context, "15");
-            RecommendTestUtils.test(dataModel.getContext().getConf(), context, "20");
-            RecommendTestUtils.test(dataModel.getContext().getConf(), context, "25");
-            RecommendTestUtils.test(dataModel.getContext().getConf(), context, "30");
-            RecommendTestUtils.test(dataModel.getContext().getConf(), context, "35");
-            RecommendTestUtils.test(dataModel.getContext().getConf(), context, "40");
-            RecommendTestUtils.test(dataModel.getContext().getConf(), context, "45");
-            RecommendTestUtils.test(dataModel.getContext().getConf(), context, "50");
+            int index = 0;
+            for (int i = 5; i <= 50; i += 5) {
+                ExperimentResult result = RecommendTestUtils.test(dataModel.getContext().getConf(), context, i + "");
+                values[index][0] = i + "";
+                values[index][1] = result.getMae() + "";
+                values[index][2] = result.getPrecision() + "";
+                values[index][3] = result.getRecall() + "";
+                index++;
+            }
+            HSSFWorkbook wb = ExcelUtils.getHSSFWorkbook(sheetName, title, values, null);
+            ExcelUtils.writeExcel(wb, excelFileName);
         } catch (Exception e) {
             logger.error("测试指标异常", e);
         }
     }
 
-    protected void testPrecision(DataModel dataModel) {
-        try {
-            RecommendTestUtils.testPrecision(dataModel.getContext().getConf(), context, "5");
-            RecommendTestUtils.testPrecision(dataModel.getContext().getConf(), context, "10");
-            RecommendTestUtils.testPrecision(dataModel.getContext().getConf(), context, "15");
-            RecommendTestUtils.testPrecision(dataModel.getContext().getConf(), context, "20");
-            RecommendTestUtils.testPrecision(dataModel.getContext().getConf(), context, "25");
-            RecommendTestUtils.testPrecision(dataModel.getContext().getConf(), context, "30");
-            RecommendTestUtils.testPrecision(dataModel.getContext().getConf(), context, "35");
-            RecommendTestUtils.testPrecision(dataModel.getContext().getConf(), context, "40");
-            RecommendTestUtils.testPrecision(dataModel.getContext().getConf(), context, "45");
-            RecommendTestUtils.testPrecision(dataModel.getContext().getConf(), context, "50");
-        } catch (Exception e) {
-            logger.error("测试Precision指标异常", e);
-        }
-    }
-
-    protected void testRecall(DataModel dataModel) {
-
-    }
-
-    protected void testRMSE(DataModel dataModel) {
-    }
-
-    protected void testMAE(DataModel dataModel) {
-        try {
-            RecommendTestUtils.testMAE(dataModel.getContext().getConf(), context, "5");
-            RecommendTestUtils.testMAE(dataModel.getContext().getConf(), context, "10");
-            RecommendTestUtils.testMAE(dataModel.getContext().getConf(), context, "15");
-            RecommendTestUtils.testMAE(dataModel.getContext().getConf(), context, "20");
-            RecommendTestUtils.testMAE(dataModel.getContext().getConf(), context, "25");
-            RecommendTestUtils.testMAE(dataModel.getContext().getConf(), context, "30");
-            RecommendTestUtils.testMAE(dataModel.getContext().getConf(), context, "35");
-            RecommendTestUtils.testMAE(dataModel.getContext().getConf(), context, "40");
-            RecommendTestUtils.testMAE(dataModel.getContext().getConf(), context, "45");
-            RecommendTestUtils.testMAE(dataModel.getContext().getConf(), context, "50");
-        } catch (Exception e) {
-            logger.error("测试MAE指标异常", e);
-        }
-    }
-
     public static void main(String[] args) {
-//        AbstractRecommenderSimilarity similarity = new PCCSimilarity();
-        AbstractRecommenderSimilarity similarity = new CosineSimilarity();
+        AbstractRecommenderSimilarity similarity = new PCCSimilarity();
+//        AbstractRecommenderSimilarity similarity = new CosineSimilarity();
 //         AbstractRecommenderSimilarity similarity = new UPSSimilarity();
         // RecommenderSimilarity similarity = new UPSSimilarity();
         HybirdSimilarity3 hybirdSimilarity = new HybirdSimilarity3(similarity);
-        //HybirdSimilarity2 hybirdSimilarity = new HybirdSimilarity2(similarity);
-        //hybirdSimilarity.setAssociateRulePath(PropertiesUtils.testOutPath + "userArrayFianlly.txt");
+        hybirdSimilarity.setLen(2);
         similarity = hybirdSimilarity;
         MainTest test = new MainTest(similarity);
         test.test();
+//        hybirdSimilarity.setLen(8);
+//        HybirdSimilarity2 hybirdSimilarity = new HybirdSimilarity2(similarity);
+//        hybirdSimilarity.setAssociateRulePath(PropertiesUtils.testOutPath + "userArrayFianlly.txt");
+//        similarity = hybirdSimilarity;
+//        MainTest test = new MainTest(similarity);
+//        test.test();
     }
 }

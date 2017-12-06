@@ -14,7 +14,9 @@ import patternMining.ItemAssociateRuleMining;
 import patternMining.ItemScorePreprocess;
 
 import java.lang.reflect.Field;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class HybirdSimilarity3 extends AbstractRecommenderSimilarity {
     //应该由外部提供
@@ -38,6 +40,8 @@ public class HybirdSimilarity3 extends AbstractRecommenderSimilarity {
     private Map<Integer, HashMap<Integer, Integer>> map;// 模式挖掘结果
 
     private List<int[]> ItemChanges;
+
+    private int len = 2;
 
     /**
      * 将传统的相似度算法和模式挖掘的用户分组结果传入
@@ -71,6 +75,14 @@ public class HybirdSimilarity3 extends AbstractRecommenderSimilarity {
         return 0;
     }
 
+    public void setLen(int len) {
+        this.len = len;
+    }
+
+    public int getLen() {
+        return len;
+    }
+
     /**
      * 已有实现通过调用{@code getCorrelation()获得两个用户间的相似度} <br/>
      * 现在需要通过挖掘的来计算间接相似度
@@ -79,7 +91,7 @@ public class HybirdSimilarity3 extends AbstractRecommenderSimilarity {
     public void buildSimilarityMatrix(DataModel dataModel) {
         this.dataModel = dataModel;
         // 1,获取map,itemChanges,（应该错了，内部编号和外部编号不同，需要将外部编号和内部编号统一，已经实现）
-        map = new ItemAssociateRuleMining(2).getItemSet(associateRulePath);
+        map = new ItemAssociateRuleMining(len).getItemSet(associateRulePath);
 
         System.out.println(map.get(1));
         System.out.println(map.get(-1));
@@ -125,7 +137,7 @@ public class HybirdSimilarity3 extends AbstractRecommenderSimilarity {
                     maxRate = Math.sqrt(maxArray[j] * maxArrayUser[i]);
                     minRate = Math.sqrt(minArray[j] * minArrayUser[i]);
                     midRate = Math.sqrt(itemMeanRate[j] * userMeanRate[i]);
-                    double predictRate = predictRate(oldMatrix, i, j);
+                    double predictRate = predictRate1(oldMatrix, i, j);
                     if (!Double.isNaN(predictRate) && predictRate != 0) {
                         // trainMatrix.set(i, j, predictRate);
                         dataTable.put(i, j, predictRate);
@@ -140,6 +152,17 @@ public class HybirdSimilarity3 extends AbstractRecommenderSimilarity {
         // 3,调用传入的相似度算法
         int numUsers = trainMatrix.numRows();
         // int numItems = trainMatrix.numColumns();
+
+        // 先通过反射设置conf
+        Class<?> clazz = baseSimilarity.getClass().getSuperclass();
+        try {
+            Field f = clazz.getDeclaredField("conf");
+            f.setAccessible(true);
+            f.set(baseSimilarity, dataModel.getContext().getConf());
+        } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
 
         similarityMatrix = new SymmMatrix(numUsers);
 
@@ -157,16 +180,6 @@ public class HybirdSimilarity3 extends AbstractRecommenderSimilarity {
                     continue;
                 }
                 // 调用传统相似度计算方法
-                // 先通过反射设置conf
-                Class<?> clazz = baseSimilarity.getClass().getSuperclass();
-                try {
-                    Field f = clazz.getDeclaredField("conf");
-                    f.setAccessible(true);
-                    f.set(baseSimilarity, dataModel.getContext().getConf());
-                } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
                 double sim = baseSimilarity.getCorrelation(thisVector, thatVector);// 预测相似度
                 double sim1 = baseSimilarity.getCorrelation(thisVectorOld, thatVectorOld);// 真实相似度
                 // System.out.println("用户" + i + "对用户" + j + "的真实相似度为：" + sim1 +
@@ -253,6 +266,72 @@ public class HybirdSimilarity3 extends AbstractRecommenderSimilarity {
         double tempHigh = a, tempLow = b;
         // ====================使用sigmod函数============================
         double sigmoid = 1.0 / (1 + Math.exp(-(a - b)));
+        tempHigh = sigmoid;
+        tempLow = 1 - sigmoid;
+        return rBase - tempLow * (rBase - minRate) + tempHigh * (maxRate - rBase);
+    }
+
+    private double predictRate1(SparseMatrix oldMatrix, int userId, int itemId) {
+        // 计算目标项目itemId的用户优化评分ru
+        double ru = 0;
+        SparseVector column = oldMatrix.column(itemId);
+        SparseVector row = oldMatrix.row(userId);
+        for (int i = 0; i < column.getCapacity(); i++) {
+            if (column.get(i) != 0.0) {
+                ru += (column.get(i) - itemMeanRate[itemId]);
+            }
+        }
+        ru = ru / column.size() + userMeanRate[userId];
+
+        // -----------------------------------------------------------------------------------
+        // TODO Auto-generated method stub
+        HashMap<Integer, Integer> zheng = map.get(itemId + 1);// +i的频繁项集
+        HashMap<Integer, Integer> fu = map.get(-(itemId + 1));// -i的频繁项集
+        // 求交集
+        if (ItemChanges.size() <= userId)// 由于数据集被随机切为1：4，导致有些用户不在train集中。
+            return 0;
+        int[] userArray = ItemChanges.get(userId);//(POSITIVE = zheng ^ userArray, NEGATIVE = fu ^ userArray)
+        int x = 0;//|POSITIVE|
+        int y = 0;//|NEGATIVE|
+        double a = 0;//Phigh
+        double b = 0;//Plow
+        // 计算ri
+        double ri = 0;
+
+        if (zheng != null) {
+            Integer itemIdTimes = zheng.get(itemId + 1);
+            if (itemIdTimes != null) {
+                for (int i = 0; i < userArray.length; i++) {
+                    Integer times = zheng.get(userArray[i]);
+                    if (times != null) {
+                        ri += (row.get(Math.abs(userArray[i]) - 1) - userMeanRate[userId]);
+                        x++;
+                        a += times * 1.0 / itemIdTimes;
+                    }
+                }
+            }
+        }
+        if (fu != null) {
+            Integer itemIdTimes = fu.get(-(itemId + 1));
+            if (itemIdTimes != null) {
+                for (int i = 0; i < userArray.length; i++) {
+                    Integer times = fu.get(userArray[i]);
+                    if (times != null) {
+                        ri += (row.get(Math.abs(userArray[i]) - 1) - userMeanRate[userId]);
+                        y++;
+                        b += times * 1.0 / itemIdTimes;
+                    }
+                }
+            }
+        }
+        if (a == 0 && b == 0)
+            return 0;
+        // 通过上述计算得出rt，进而得出rBase
+        ri = ri / (x + y) + itemMeanRate[itemId];
+        double rBase = Math.sqrt(ru * ri);
+        double tempHigh = a / x, tempLow = b / y;
+        // ====================使用sigmod函数============================
+        double sigmoid = 1.0 / (1 + Math.exp(-(tempHigh - tempLow)));
         tempHigh = sigmoid;
         tempLow = 1 - sigmoid;
         return rBase - tempLow * (rBase - minRate) + tempHigh * (maxRate - rBase);
