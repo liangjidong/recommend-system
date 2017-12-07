@@ -32,6 +32,8 @@ public class ExtractData {
             br.close();
             index = 0;
             int randomNum;
+            //首先选择1355个用户,每个用户至少对30个物品打分
+
             while (index < total) {
                 randomNum = randomNum(0, 1000209);
                 line = data[randomNum];

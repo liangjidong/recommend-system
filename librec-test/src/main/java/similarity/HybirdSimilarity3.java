@@ -329,7 +329,8 @@ public class HybirdSimilarity3 extends AbstractRecommenderSimilarity {
         // 通过上述计算得出rt，进而得出rBase
         ri = ri / (x + y) + itemMeanRate[itemId];
         double rBase = Math.sqrt(ru * ri);
-        double tempHigh = a / x, tempLow = b / y;
+        //下面两行代码:这里是和论文编写有出入的地方,需要修改
+        double tempHigh = a, tempLow = b;
         // ====================使用sigmod函数============================
         double sigmoid = 1.0 / (1 + Math.exp(-(tempHigh - tempLow)));
         tempHigh = sigmoid;

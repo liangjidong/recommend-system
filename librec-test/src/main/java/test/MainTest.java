@@ -6,7 +6,7 @@ import common.RecommendTestUtils;
 import net.librec.data.DataModel;
 import net.librec.recommender.RecommenderContext;
 import net.librec.similarity.AbstractRecommenderSimilarity;
-import net.librec.similarity.PCCSimilarity;
+import net.librec.similarity.CosineSimilarity;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,20 +63,17 @@ public class MainTest {
     }
 
     public static void main(String[] args) {
-        AbstractRecommenderSimilarity similarity = new PCCSimilarity();
-//        AbstractRecommenderSimilarity similarity = new CosineSimilarity();
+//        AbstractRecommenderSimilarity similarity = new PCCSimilarity();
+        AbstractRecommenderSimilarity similarity = new CosineSimilarity();
+        MainTest test = new MainTest(similarity);
+//        test.test();
 //         AbstractRecommenderSimilarity similarity = new UPSSimilarity();
         // RecommenderSimilarity similarity = new UPSSimilarity();
+        similarity = new CosineSimilarity();
         HybirdSimilarity3 hybirdSimilarity = new HybirdSimilarity3(similarity);
-        hybirdSimilarity.setLen(2);
+        hybirdSimilarity.setLen(20);
         similarity = hybirdSimilarity;
-        MainTest test = new MainTest(similarity);
+        test = new MainTest(similarity);
         test.test();
-//        hybirdSimilarity.setLen(8);
-//        HybirdSimilarity2 hybirdSimilarity = new HybirdSimilarity2(similarity);
-//        hybirdSimilarity.setAssociateRulePath(PropertiesUtils.testOutPath + "userArrayFianlly.txt");
-//        similarity = hybirdSimilarity;
-//        MainTest test = new MainTest(similarity);
-//        test.test();
     }
 }
